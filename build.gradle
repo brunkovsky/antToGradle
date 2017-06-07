@@ -1,0 +1,56 @@
+plugins {
+    id "de.undercouch.download" version "1.2"
+    id 'com.github.eerohele.saxon-gradle' version '0.2.1'
+}
+
+group 'Ngoar'
+version '1.0-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+
+import de.undercouch.gradle.tasks.download.Download
+
+task downloadFile(type: Download) {
+//    src([jahiaHomePage, jahiaBasicPage, jahiaCachePage, jahiaJasonPage])
+    src(jahiaHomePage)
+    dest buildDir
+    username jahiaName
+    password jahiaPassword
+    overwrite true
+}
+
+xslt {
+    FileCollection collection = files('src/file1.txt',
+            new File('src/file2.txt'),
+            ['src/file3.txt', 'src/file4.txt'])
+    stylesheet 'src/xslt/clean_jcr.xsl'
+    input fileTree(dir: buildDir, include: '*.xml')
+    output files (collection)
+    parameters(
+            debug: true,
+            version: project.version
+    )
+}
+
+task printProps {
+    doLast {
+        println buildDir
+        println jahiaName
+        println jahiaPassword
+    }
+}
+
+/*
+<target name="clean">
+    <mkdir dir="${basedir}/src/data/clean" />
+    <xslt basedir="${basedir}/download/source" destdir="${basedir}/src/data/clean"
+    extension=".xml"
+    style="src/xslt/clean_jcr.xsl"
+    force="true">
+    <factory name="net.sf.saxon.TransformerFactoryImpl"/>
+    <outputproperty name="{http://xml.apache.org/xslt}indent-amount" value="4"/>
+    </xslt>
+</target>
+*/
